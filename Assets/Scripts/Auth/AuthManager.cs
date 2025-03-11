@@ -12,11 +12,12 @@ using UnityEngine.UI;
 using Object = System.Object;
 
 
-public class ApiClient : MonoBehaviour
+public class AuthManager : MonoBehaviour
 {
 
     public Button RegisterBTN;
     public Button LoginBTN;
+    public bool isLogin = true;
     
     public TMP_InputField EmailInput;
     public TMP_Text EmailText;
@@ -24,23 +25,6 @@ public class ApiClient : MonoBehaviour
     public TMP_Text PasswordText;
     
     // public PostLoginResponseDto postLoginResponseDto;
-    public string id;
-    
-    public static ApiClient instance { get; private set; }
-    void Awake()
-    {
-        // hier controleren we of er al een instantie is van deze singleton
-        // als dit zo is dan hoeven we geen nieuwe aan te maken en verwijderen we deze
-        if (instance != null && instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            instance = this;
-        }
-        DontDestroyOnLoad(this);
-    }
 
     private void NextScene()
     {
@@ -48,7 +32,6 @@ public class ApiClient : MonoBehaviour
         EmailText.text = "";
         PasswordInput.text = "";
         PasswordText.text = "";
-        Debug.Log(id);
         SceneManager.LoadScene("EnvironmentSelector");
     }
 
@@ -108,10 +91,26 @@ public class ApiClient : MonoBehaviour
         if (!Validate()) return;
         PostLoginRequestDto postLoginRequestDto = new PostLoginRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postLoginRequestDto);
-        var r =  await PerformApiCall("https://localhost:7005/account/login", "POST", jsonData);
+        var r =  await ApiManagement.PerformApiCall("https://localhost:7005/account/login", "POST", jsonData);
         if (r == null) return;
-        id = await PerformApiCall("https://localhost:7005/user/" + EmailInput.text, "GET");
+        SessionData.UserId = await ApiManagement.PerformApiCall("https://localhost:7005/user/" + EmailInput.text, "GET");
         NextScene();
+    }
+
+    public void switchAuth()
+    {
+        if (isLogin)
+        {
+            RegisterBTN.gameObject.SetActive(true);
+            LoginBTN.gameObject.SetActive(false);
+            isLogin = false;
+        }
+        else
+        {
+            RegisterBTN.gameObject.SetActive(false);
+            LoginBTN.gameObject.SetActive(true);
+            isLogin = true;
+        }
     }
 
     public async void RegisterUser()
@@ -119,43 +118,9 @@ public class ApiClient : MonoBehaviour
         if (!Validate()) return;
         PostRegisterRequestDto postRegisterRequestDto = new PostRegisterRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postRegisterRequestDto);
-        var r = await PerformApiCall("https://localhost:7005/account/register", "POST", jsonData);
+        var r = await ApiManagement.PerformApiCall("https://localhost:7005/account/register", "POST", jsonData);
         if (r == null) return;
-        id = await PerformApiCall("https://localhost:7005/user/" + EmailInput.text, "GET");
+        SessionData.UserId = await ApiManagement.PerformApiCall("https://localhost:7005/user/" + EmailInput.text, "GET");
         NextScene();
-    }
-    
-    private async Task<string> PerformApiCall(string url, string method, string jsonData = null, string token = null)
-    {
-        using (UnityWebRequest request = new UnityWebRequest(url, method))
-        {
-            if (!string.IsNullOrEmpty(jsonData))
-            {
-                byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
-                request.uploadHandler = new UploadHandlerRaw(jsonToSend);
-            }
-
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-            
-            if (!string.IsNullOrEmpty(token))
-            {
-                request.SetRequestHeader("Authorization", "Bearer " + token);
-            }
-
-            await request.SendWebRequest();
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                return request.downloadHandler.text;
-            }
-            else 
-            {
-                // string errorjson = request.downloadHandler.text;
-                // List<string> errors = new List<string>();
-                
-                Debug.LogError("Fout bij API-aanroep: " + request.error);
-                return null;
-            }
-        }
     }
 }
