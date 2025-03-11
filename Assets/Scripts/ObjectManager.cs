@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,10 +33,10 @@ public class ObjectManager : MonoBehaviour
         UISideMenu.SetActive(true);
     }
 
-    // Methode om de huidige scène te resetten
+    // Methode om de huidige scï¿½ne te resetten
     public void Reset()
     {
-        // Laad de huidige scène opnieuw
+        // Laad de huidige scï¿½ne opnieuw
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
