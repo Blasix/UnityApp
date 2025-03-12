@@ -85,8 +85,6 @@ public class AuthManager : MonoBehaviour
 
     public async void LoginUser()
     {
-        // string email = "test@blasix.com"; 
-        // string password = "Test!23456";
         if (!Validate()) return;
         PostLoginRequestDto postLoginRequestDto = new PostLoginRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postLoginRequestDto);
