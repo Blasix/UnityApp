@@ -17,7 +17,6 @@ public class AuthManager : MonoBehaviour
     public TMP_InputField PasswordInput;
     public TMP_Text PasswordText;
     
-    // public PostLoginResponseDto postLoginResponseDto;
 
     private void NextScene()
     {
@@ -35,6 +34,10 @@ public class AuthManager : MonoBehaviour
             EmailText.text = "Email is required";
             return false;
         }
+        else
+        {
+            EmailText.text = "";
+        }
         
         if (string.IsNullOrEmpty(PasswordInput.text))
         {
@@ -42,38 +45,41 @@ public class AuthManager : MonoBehaviour
             return false;
         }
         
-        if (PasswordInput.text.Length < 10)
+        else if (PasswordInput.text.Length < 10)
         {
             PasswordText.text = "Password must be at least 10 characters long";
             return false;
         }
         
-        if (!PasswordInput.text.Any(char.IsLower))
+        else if (!PasswordInput.text.Any(char.IsLower))
         {
             PasswordText.text = "Password must contain at least 1 lowercase character";
             return false;
         }
         
-        if (!PasswordInput.text.Any(char.IsUpper))
+        else if (!PasswordInput.text.Any(char.IsUpper))
         {
             PasswordText.text = "Password must contain at least 1 uppercase character";
             return false;
         }
         
-        if (!PasswordInput.text.Any(char.IsDigit))
+        else if (!PasswordInput.text.Any(char.IsDigit))
         {
             PasswordText.text = "Password must contain at least 1 digit";
             return false;
         }
         
-        if (PasswordInput.text.All(char.IsLetterOrDigit))
+        else if (PasswordInput.text.All(char.IsLetterOrDigit))
         {
             PasswordText.text = "Password must contain at least 1 non-alphanumeric character";
             return false;
         }
+
+        else
+        {
+            PasswordText.text = "";
+        }
         
-        EmailText.text = "";
-        PasswordText.text = "";
         return true;
     }
 
@@ -84,9 +90,10 @@ public class AuthManager : MonoBehaviour
         if (!Validate()) return;
         PostLoginRequestDto postLoginRequestDto = new PostLoginRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postLoginRequestDto);
-        var r =  await ApiManagement.PerformApiCall("https://localhost:7005/account/login", "POST", jsonData);
-        if (r == null) return;
-        SessionData.UserId = await ApiManagement.PerformApiCall("https://localhost:7005/user/" + EmailInput.text, "GET");
+        var loginData =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
+        if (loginData == null) return;
+        SessionData.postLoginResponseDto = JsonUtility.FromJson<PostLoginResponseDto>(loginData);
+        SessionData.UserId = await ApiManagement.PerformApiCall(SessionData.Url + "/user/" + EmailInput.text, "GET");
         NextScene();
     }
 
@@ -111,9 +118,12 @@ public class AuthManager : MonoBehaviour
         if (!Validate()) return;
         PostRegisterRequestDto postRegisterRequestDto = new PostRegisterRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postRegisterRequestDto);
-        var r = await ApiManagement.PerformApiCall("https://localhost:7005/account/register", "POST", jsonData);
+        var r = await ApiManagement.PerformApiCall(SessionData.Url + "/account/register", "POST", jsonData);
         if (r == null) return;
-        SessionData.UserId = await ApiManagement.PerformApiCall("https://localhost:7005/user/" + EmailInput.text, "GET");
+        var loginData =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
+        if (loginData == null) return;
+        SessionData.postLoginResponseDto = JsonUtility.FromJson<PostLoginResponseDto>(loginData);
+        SessionData.UserId = await ApiManagement.PerformApiCall(SessionData.Url + "/user/" + EmailInput.text, "GET");
         NextScene();
     }
 }

@@ -15,10 +15,11 @@ public class Object2D : MonoBehaviour
 
     private void OnMouseUpAsButton()
     {
-        isDragging = !isDragging;
+        isDragging = false;
 
         if (!isDragging)
         {
+            ObjectManager.SaveObject();
             objectManager.ShowMenu();
         }
     }

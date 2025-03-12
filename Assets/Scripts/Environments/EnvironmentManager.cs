@@ -25,7 +25,7 @@ namespace Environments
         
         async void Start()
         {
-            var result = await ApiManagement.PerformApiCall("https://localhost:7005/Environment2D/user/" + SessionData.UserId, "GET");
+            var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/user/" + SessionData.UserId, "GET");
             
             if (result == null) return;
             environments = JsonConvert.DeserializeObject<List<Environment2DDto>>(result);
@@ -85,6 +85,11 @@ namespace Environments
             }
         }
         
+        public void GoBack()
+        {
+            SceneManager.LoadScene("EnvironmentSelector");
+        }
+        
         private void LoadEnvironment(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -100,7 +105,7 @@ namespace Environments
         
         private async void DeleteEnvironment(string id)
         {
-            await ApiManagement.PerformApiCall("https://localhost:7005/Environment2D/" + id, "DELETE");
+            await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + id, "DELETE");
             SceneManager.LoadScene("EnvironmentSelector");
         }
     }
