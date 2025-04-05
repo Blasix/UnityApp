@@ -8,7 +8,7 @@ public abstract class ApiManagement
     public static async Task<string> PerformApiCall(string url, string method, string jsonData = null)
     {
         string token = null;
-        if (SessionData.postLoginResponseDto != null) token = SessionData.postLoginResponseDto.accessToken;
+        if (SessionData.TokenDto != null) token = SessionData.TokenDto.accessToken;
         using (UnityWebRequest request = new UnityWebRequest(url, method))
         {
             if (!string.IsNullOrEmpty(jsonData))

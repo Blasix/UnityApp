@@ -59,17 +59,17 @@ public class ObjectManager : MonoBehaviour
             object2D.transform.localScale.y,
             object2D.transform.rotation.eulerAngles.z,
             renderer != null ? renderer.sortingLayerID : 0,
-            SessionData.EnvironmentId
+            ""
         );
         
-        var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Object2D", "POST", JsonUtility.ToJson(object2DDto));
+        var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "POST", JsonUtility.ToJson(object2DDto));
         object2DDto = JsonUtility.FromJson<Object2DDto>(result);
         
     }
     
     private async Task LoadObjects()
     {
-        var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Object2D/environment/" + SessionData.EnvironmentId, "GET");
+        var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "GET");
         List<Object2DDto> object2DDtos = JsonConvert.DeserializeObject<List<Object2DDto>>(result);
         
         foreach (var object2DDto in object2DDtos)
@@ -102,7 +102,7 @@ public class ObjectManager : MonoBehaviour
     public async void Reset()
     {
         // Laad de huidige sc�ne opnieuw
-        await ApiManagement.PerformApiCall(SessionData.Url + "/Object2D/environment/" + SessionData.EnvironmentId, "DELETE");
+        await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "DELETE");
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     

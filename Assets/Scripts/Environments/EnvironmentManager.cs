@@ -25,7 +25,7 @@ namespace Environments
         
         async void Start()
         {
-            var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/user/" + SessionData.UserId, "GET");
+            var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D", "GET");
             
             if (result == null) return;
             environments = JsonConvert.DeserializeObject<List<Environment2DDto>>(result);

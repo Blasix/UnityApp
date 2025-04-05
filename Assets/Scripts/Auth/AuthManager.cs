@@ -90,8 +90,7 @@ public class AuthManager : MonoBehaviour
         string jsonData = JsonUtility.ToJson(postLoginRequestDto);
         var loginData =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
         if (loginData == null) return;
-        SessionData.postLoginResponseDto = JsonUtility.FromJson<PostLoginResponseDto>(loginData);
-        SessionData.UserId = await ApiManagement.PerformApiCall(SessionData.Url + "/user/" + EmailInput.text, "GET");
+        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginData);
         NextScene();
     }
 
@@ -120,8 +119,7 @@ public class AuthManager : MonoBehaviour
         if (r == null) return;
         var loginData =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
         if (loginData == null) return;
-        SessionData.postLoginResponseDto = JsonUtility.FromJson<PostLoginResponseDto>(loginData);
-        SessionData.UserId = await ApiManagement.PerformApiCall(SessionData.Url + "/user/" + EmailInput.text, "GET");
+        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginData);
         NextScene();
     }
 }

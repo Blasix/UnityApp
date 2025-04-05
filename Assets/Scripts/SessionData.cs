@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class SessionData : MonoBehaviour
 {
-    public static PostLoginResponseDto postLoginResponseDto;
-    public static string UserId;
+    public static TokenDto TokenDto;
     public static string EnvironmentId;
-    public const string Url = "https://avansict2238591.azurewebsites.net";
-    // public const string Url = "https://localhost:7082";
+    // public const string Url = "https://avansict2238591.azurewebsites.net";
+    public const string Url = "https://localhost:7287";
+    
     
     public static SessionData instance { get; private set; }
     void Awake()

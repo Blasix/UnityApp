@@ -44,7 +44,7 @@ namespace Environments
         public async void CreateEnvironment()
         {
             if (!Verify()) return;
-            Environment2DDto environment2DCreationDto = new Environment2DDto("", NameInput.text, 0, 0, SessionData.UserId);
+            Environment2DDto environment2DCreationDto = new Environment2DDto("", NameInput.text, 0, 0, "");
             var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D", "POST", JsonUtility.ToJson(environment2DCreationDto));
             Environment2DDto environment2DDto = JsonUtility.FromJson<Environment2DDto>(result);
             SessionData.EnvironmentId = environment2DDto.id;
