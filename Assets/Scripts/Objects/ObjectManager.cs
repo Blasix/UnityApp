@@ -16,7 +16,7 @@ public class ObjectManager : MonoBehaviour
     private List<GameObject> placedObjects = new List<GameObject>();
 
     private static int ObjectID;
-    private static GameObject gameObject;
+    private new static GameObject gameObject;
     
     async void Start()
     {
@@ -63,13 +63,13 @@ public class ObjectManager : MonoBehaviour
         );
         
         var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "POST", JsonUtility.ToJson(object2DDto));
-        object2DDto = JsonUtility.FromJson<Object2DDto>(result.Data);
+        object2DDto = JsonUtility.FromJson<Object2DDto>(result.getData());
     }
     
     private async Task LoadObjects()
     {
         var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "GET");
-        List<Object2DDto> object2DDtos = JsonConvert.DeserializeObject<List<Object2DDto>>(result.Data);
+        List<Object2DDto> object2DDtos = JsonConvert.DeserializeObject<List<Object2DDto>>(result.getData());
         
         foreach (var object2DDto in object2DDtos)
         {

@@ -1,5 +1,6 @@
+using System;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Net.Mail;
 using Auth;
 using TMPro;
 using UnityEngine;
@@ -30,11 +31,17 @@ public class AuthManager : MonoBehaviour
 
     private bool Validate()
     {
+        EmailText.text = "";
+        PasswordText.text = "";
+        
         // Email
         if (string.IsNullOrEmpty(EmailInput.text))
             EmailText.text = "Email is required";
-        if (Regex.IsMatch(EmailInput.text, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        try {
+            EmailInput.text = new MailAddress(EmailInput.text).Address;
+        } catch(FormatException) {
             EmailText.text = "Invalid email address";
+        }
         
         // Password
         if (string.IsNullOrEmpty(PasswordInput.text))
@@ -49,13 +56,12 @@ public class AuthManager : MonoBehaviour
             PasswordText.text = "Password must contain at least 1 digit";
         if (PasswordInput.text.All(char.IsLetterOrDigit)) 
             PasswordText.text = "Password must contain at least 1 non-alphanumeric character";
-
-        if (!string.IsNullOrEmpty(EmailInput.text) || !string.IsNullOrEmpty(PasswordInput.text)) return false;
+        
+        if (!string.IsNullOrEmpty(EmailText.text) || !string.IsNullOrEmpty(PasswordText.text)) return false;
         
         EmailText.text = "";
         PasswordText.text = "";
         return true;
-
     }
 
     public async void LoginUser()
@@ -64,9 +70,17 @@ public class AuthManager : MonoBehaviour
         PostLoginRequestDto postLoginRequestDto = new PostLoginRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postLoginRequestDto);
         var loginResult =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
-        if (loginResult == null) return;
-        Debug.Log(loginResult.ToString());
-        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginResult.Data);
+        if (loginResult == null)
+        {
+            PasswordInput.text = "Unknown error";
+            return;
+        }
+        if (loginResult.GetAuthError() != null)
+        {
+            PasswordText.text = loginResult.GetAuthError();
+            return;
+        }
+        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginResult.getData());
         NextScene();
     }
 
@@ -92,11 +106,23 @@ public class AuthManager : MonoBehaviour
         PostRegisterRequestDto postRegisterRequestDto = new PostRegisterRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postRegisterRequestDto);
         var registerResult = await ApiManagement.PerformApiCall(SessionData.Url + "/account/register", "POST", jsonData);
-        if (registerResult == null) return;
-        Debug.Log(registerResult.ToString());
+        if (registerResult == null)
+        {
+            PasswordInput.text = "Unknown error";
+            return;
+        }
+        if (registerResult.GetAuthError() != null)
+        {
+            PasswordText.text = registerResult.GetAuthError();
+            return;
+        }
         var loginResult =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
-        if (loginResult == null) return;
-        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginResult.Data);
+        if (loginResult == null) 
+        {
+            PasswordInput.text = "Unknown error";
+            return;
+        }
+        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginResult.getData());
         NextScene();
     }
 }
