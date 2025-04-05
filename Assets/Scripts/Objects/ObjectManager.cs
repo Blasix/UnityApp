@@ -63,14 +63,13 @@ public class ObjectManager : MonoBehaviour
         );
         
         var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "POST", JsonUtility.ToJson(object2DDto));
-        object2DDto = JsonUtility.FromJson<Object2DDto>(result);
-        
+        object2DDto = JsonUtility.FromJson<Object2DDto>(result.Data);
     }
     
     private async Task LoadObjects()
     {
         var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "GET");
-        List<Object2DDto> object2DDtos = JsonConvert.DeserializeObject<List<Object2DDto>>(result);
+        List<Object2DDto> object2DDtos = JsonConvert.DeserializeObject<List<Object2DDto>>(result.Data);
         
         foreach (var object2DDto in object2DDtos)
         {

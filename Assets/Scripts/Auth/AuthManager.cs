@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.RegularExpressions;
 using Auth;
 using TMPro;
 using UnityEngine;
@@ -29,58 +30,32 @@ public class AuthManager : MonoBehaviour
 
     private bool Validate()
     {
+        // Email
         if (string.IsNullOrEmpty(EmailInput.text))
-        {
             EmailText.text = "Email is required";
-            return false;
-        }
-        else
-        {
-            EmailText.text = "";
-        }
+        if (Regex.IsMatch(EmailInput.text, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            EmailText.text = "Invalid email address";
         
+        // Password
         if (string.IsNullOrEmpty(PasswordInput.text))
-        {
             PasswordText.text = "Password is required";
-            return false;
-        }
-        
-        else if (PasswordInput.text.Length < 10)
-        {
+        if (PasswordInput.text.Length < 10) 
             PasswordText.text = "Password must be at least 10 characters long";
-            return false;
-        }
-        
-        else if (!PasswordInput.text.Any(char.IsLower))
-        {
+        if (!PasswordInput.text.Any(char.IsLower))
             PasswordText.text = "Password must contain at least 1 lowercase character";
-            return false;
-        }
-        
-        else if (!PasswordInput.text.Any(char.IsUpper))
-        {
+        if (!PasswordInput.text.Any(char.IsUpper))
             PasswordText.text = "Password must contain at least 1 uppercase character";
-            return false;
-        }
-        
-        else if (!PasswordInput.text.Any(char.IsDigit))
-        {
+        if (!PasswordInput.text.Any(char.IsDigit)) 
             PasswordText.text = "Password must contain at least 1 digit";
-            return false;
-        }
-        
-        else if (PasswordInput.text.All(char.IsLetterOrDigit))
-        {
+        if (PasswordInput.text.All(char.IsLetterOrDigit)) 
             PasswordText.text = "Password must contain at least 1 non-alphanumeric character";
-            return false;
-        }
 
-        else
-        {
-            PasswordText.text = "";
-        }
+        if (!string.IsNullOrEmpty(EmailInput.text) || !string.IsNullOrEmpty(PasswordInput.text)) return false;
         
+        EmailText.text = "";
+        PasswordText.text = "";
         return true;
+
     }
 
     public async void LoginUser()
@@ -88,9 +63,10 @@ public class AuthManager : MonoBehaviour
         if (!Validate()) return;
         PostLoginRequestDto postLoginRequestDto = new PostLoginRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postLoginRequestDto);
-        var loginData =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
-        if (loginData == null) return;
-        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginData);
+        var loginResult =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
+        if (loginResult == null) return;
+        Debug.Log(loginResult.ToString());
+        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginResult.Data);
         NextScene();
     }
 
@@ -115,11 +91,12 @@ public class AuthManager : MonoBehaviour
         if (!Validate()) return;
         PostRegisterRequestDto postRegisterRequestDto = new PostRegisterRequestDto(EmailInput.text, PasswordInput.text);
         string jsonData = JsonUtility.ToJson(postRegisterRequestDto);
-        var r = await ApiManagement.PerformApiCall(SessionData.Url + "/account/register", "POST", jsonData);
-        if (r == null) return;
-        var loginData =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
-        if (loginData == null) return;
-        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginData);
+        var registerResult = await ApiManagement.PerformApiCall(SessionData.Url + "/account/register", "POST", jsonData);
+        if (registerResult == null) return;
+        Debug.Log(registerResult.ToString());
+        var loginResult =  await ApiManagement.PerformApiCall(SessionData.Url + "/account/login", "POST", jsonData);
+        if (loginResult == null) return;
+        SessionData.TokenDto = JsonUtility.FromJson<TokenDto>(loginResult.Data);
         NextScene();
     }
 }

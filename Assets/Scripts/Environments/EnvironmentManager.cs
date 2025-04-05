@@ -28,7 +28,7 @@ namespace Environments
             var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D", "GET");
             
             if (result == null) return;
-            environments = JsonConvert.DeserializeObject<List<Environment2DDto>>(result);
+            environments = JsonConvert.DeserializeObject<List<Environment2DDto>>(result.Data);
             for (int i = 0; i < 5; i++)
             {
                 string environmentName = i < environments.Count ? environments[i].name : "Empty";

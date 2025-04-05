@@ -3,9 +3,26 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
+public class APIResponse
+{
+    public UnityWebRequest.Result APIResult {get; private set;}
+    public string Data {get; private set;}
+    
+    public APIResponse(UnityWebRequest.Result result, string data)
+    {
+        APIResult = result;
+        Data = data;
+    }
+    
+    public override string ToString()
+    {
+        return $"Result: {APIResult}, Data: {Data}";
+    }
+}
+
 public abstract class ApiManagement
 {
-    public static async Task<string> PerformApiCall(string url, string method, string jsonData = null)
+    public static async Task<APIResponse> PerformApiCall(string url, string method, string jsonData = null)
     {
         string token = null;
         if (SessionData.TokenDto != null) token = SessionData.TokenDto.accessToken;
@@ -26,18 +43,9 @@ public abstract class ApiManagement
             }
 
             await request.SendWebRequest();
-            if (request.result == UnityWebRequest.Result.Success)
-            { 
-                return request.downloadHandler.text;
-            }
-            else 
-            { 
-                // string errorjson = request.downloadHandler.text;
-                // List<string> errors = new List<string>();
-                
-                Debug.LogError("Fout bij API-aanroep: " + request.error);
-                return null;
-            }
+            
+            APIResponse response = new APIResponse(request.result, request.downloadHandler.text);
+            return response;
         }
     }
 }
