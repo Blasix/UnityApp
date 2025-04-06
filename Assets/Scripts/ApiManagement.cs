@@ -33,6 +33,14 @@ public class APIResponse
         if (data.Contains("DuplicateEmail")) return "This email is already registered";
         return "An unknown error occurred.";
     }
+    
+    public string GetEnvironmentError()
+    {
+        if (result == UnityWebRequest.Result.Success) return null;
+        if (result == UnityWebRequest.Result.ProtocolError)
+            return data;
+        return "An unknown error occurred.";
+    }
 }
 
 public abstract class ApiManagement
