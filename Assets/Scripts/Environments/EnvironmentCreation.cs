@@ -52,6 +52,7 @@ namespace Environments
                 return;
             }
             Environment2DDto environment2DDto = JsonUtility.FromJson<Environment2DDto>(result.getData());
+            SessionData.Environments.Add(environment2DDto);
             SessionData.EnvironmentId = environment2DDto.id;
             SceneManager.LoadScene("EnvironmentCreatorScene");
         }

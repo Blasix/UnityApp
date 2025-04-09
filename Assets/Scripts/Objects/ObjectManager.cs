@@ -44,7 +44,7 @@ public class ObjectManager : MonoBehaviour
         gameObject = instanceOfPrefab;
     }
 
-    public static async void SaveObject()
+    public static async Task SaveObject()
     {
         Object2D object2D = gameObject.GetComponent<Object2D>();
         Renderer renderer = gameObject.GetComponent<Renderer>();
@@ -62,8 +62,7 @@ public class ObjectManager : MonoBehaviour
             ""
         );
         
-        var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "POST", JsonUtility.ToJson(object2DDto));
-        object2DDto = JsonUtility.FromJson<Object2DDto>(result.getData());
+        await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "POST", JsonUtility.ToJson(object2DDto));
     }
     
     private async Task LoadObjects()

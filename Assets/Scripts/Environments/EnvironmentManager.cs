@@ -9,7 +9,6 @@ namespace Environments
 {
     public class EnvironmentManager : MonoBehaviour
     {
-        List<Environment2DDto> environments = new List<Environment2DDto>();
         
         public Button save1;
         public Button save2;
@@ -25,14 +24,17 @@ namespace Environments
         
         async void Start()
         {
-            var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D", "GET");
+            if (SessionData.Environments == null)
+            {
+                var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D", "GET");
+                if (result == null) return;
+                SessionData.Environments = JsonConvert.DeserializeObject<List<Environment2DDto>>(result.getData());
+            }
             
-            if (result == null) return;
-            environments = JsonConvert.DeserializeObject<List<Environment2DDto>>(result.getData());
             for (int i = 0; i < 5; i++)
             {
-                string environmentName = i < environments.Count ? environments[i].name : "Empty";
-                string environmentId = i < environments.Count ? environments[i].id : null;
+                string environmentName = i < SessionData.Environments.Count ? SessionData.Environments[i].name : "Empty";
+                string environmentId = i < SessionData.Environments.Count ? SessionData.Environments[i].id : null;
 
                 switch (i)
                 {
@@ -106,6 +108,7 @@ namespace Environments
         private async void DeleteEnvironment(string id)
         {
             await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + id, "DELETE");
+            SessionData.Environments.Remove(SessionData.Environments.Find(env => env.id == id));
             SceneManager.LoadScene("EnvironmentSelector");
         }
     }

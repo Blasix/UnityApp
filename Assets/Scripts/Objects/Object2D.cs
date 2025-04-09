@@ -13,15 +13,15 @@ public class Object2D : MonoBehaviour
             this.transform.position = GetMousePosition();
     }
 
-    private void OnMouseUpAsButton()
+    private async void OnMouseUpAsButton()
     {
-        isDragging = false;
-
-        if (!isDragging)
-        {
-            ObjectManager.SaveObject();
+        if (isDragging)
+        { 
+            await ObjectManager.SaveObject();
             objectManager.ShowMenu();
         }
+        
+        isDragging = false;
     }
 
     private Vector3 GetMousePosition()

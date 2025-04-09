@@ -1,10 +1,13 @@
+using System.Collections.Generic;
 using Auth;
+using Environments;
 using UnityEngine;
 
 public class SessionData : MonoBehaviour
 {
     public static TokenDto TokenDto;
     public static string EnvironmentId;
+    public static List<Environment2DDto> Environments = null;
     // public const string Url = "https://avansict2238591.azurewebsites.net";
     public const string Url = "https://localhost:7287";
     
