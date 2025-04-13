@@ -28,7 +28,7 @@ namespace Environments
             {
                 var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D", "GET");
                 if (result == null) return;
-                SessionData.Environments = JsonConvert.DeserializeObject<List<Environment2DDto>>(result.getData());
+                SessionData.Environments = JsonConvert.DeserializeObject<List<Environment2D>>(result.getData());
             }
             
             for (int i = 0; i < 5; i++)

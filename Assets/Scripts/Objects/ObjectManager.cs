@@ -49,19 +49,16 @@ public class ObjectManager : MonoBehaviour
         Object2D object2D = gameObject.GetComponent<Object2D>();
         Renderer renderer = gameObject.GetComponent<Renderer>();
 
-        Object2DDto object2DDto = new Object2DDto
+        Object2DCreationDto object2DDto = new Object2DCreationDto
         (
-            "",
             ObjectID, 
             object2D.transform.position.x, 
             object2D.transform.position.y, 
             object2D.transform.localScale.x,
             object2D.transform.localScale.y,
             object2D.transform.rotation.eulerAngles.z,
-            renderer != null ? renderer.sortingLayerID : 0,
-            ""
+            renderer != null ? renderer.sortingLayerID : 0
         );
-        
         await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D/" + SessionData.EnvironmentId + "/objects", "POST", JsonUtility.ToJson(object2DDto));
     }
     

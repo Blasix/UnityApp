@@ -39,8 +39,8 @@ namespace Environments
         public async void CreateEnvironment()
         {
             if (!Validate()) return;
-            Environment2DDto environment2DCreationDto = new Environment2DDto("", NameInput.text, 0, 0, "");
-            var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D", "POST", JsonUtility.ToJson(environment2DCreationDto));
+            Environment2DDto environment2DDto = new Environment2DDto(NameInput.text, 0, 0);
+            var result = await ApiManagement.PerformApiCall(SessionData.Url + "/Environment2D", "POST", JsonUtility.ToJson(environment2DDto));
             if (result == null)
             {
                 NameError.text = "Unknown error";
@@ -51,9 +51,9 @@ namespace Environments
                 NameError.text = result.GetEnvironmentError();
                 return;
             }
-            Environment2DDto environment2DDto = JsonUtility.FromJson<Environment2DDto>(result.getData());
-            SessionData.Environments.Add(environment2DDto);
-            SessionData.EnvironmentId = environment2DDto.id;
+            Environment2D environment2D = JsonUtility.FromJson<Environment2D>(result.getData());
+            SessionData.Environments.Add(environment2D);
+            SessionData.EnvironmentId = environment2D.id;
             SceneManager.LoadScene("EnvironmentCreatorScene");
         }
         
